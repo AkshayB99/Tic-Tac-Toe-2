@@ -153,7 +153,7 @@ function Choice0() {
   return (
     <>
       <div className="flex h-screen justify-center items-center">
-        <div className="m-auto bg-[#192A32] w-full sm:w-[415px] h-full sm:h-[650px] sm:rounded-[43px] flex justify-center absolute">
+        <div className="m-auto bg-[#192A32] w-full sm:w-[415px] h-screen sm:h-[650px] sm:rounded-[43px] flex justify-center absolute">
           <div className="sm:mt-[30%] mt-[50%] w-full">
             {/* icons */}
             <div className="flex mx-14 justify-between">
