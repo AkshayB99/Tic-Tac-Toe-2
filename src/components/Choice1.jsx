@@ -177,7 +177,7 @@ function Choice1() {
                   className="w-[32px] h-[32px] bg-[#A7BDC8] rounded-md"
                   onClick={handleRefresh}
                 >
-                  <img src="retry.png" />
+                  <img src="./Images/retry.png" />
                 </div>
               </div>
             </div>
