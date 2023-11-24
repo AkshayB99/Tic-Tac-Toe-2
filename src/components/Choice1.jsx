@@ -174,10 +174,10 @@ function Choice1() {
               </div>
               <div>
                 <div
-                  className="w-[32px] h-[32px] bg-[#A7BDC8] rounded-md"
+                  className="w-[32px] h-[32px] bg-[#A7BDC8] rounded-md flex items-center justify-center text-2xl font-bold"
                   onClick={handleRefresh}
                 >
-                  <img src="./Images/retry.png" />
+                  <div>X</div>
                 </div>
               </div>
             </div>
