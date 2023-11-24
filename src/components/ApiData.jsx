@@ -39,7 +39,7 @@ function ApiData() {
   return (
     <div className="absolute lg:bottom-6 lg:left-24">
       <div>
-        <div className="w-[290px] h-[282px] bg-[#192A32] rounded-3xl flex flex-col justify-center items-center">
+        <div className="w-[290px] h-[282px] bg-[#192A32] rounded-3xl md:flex flex-col justify-center items-center hidden">
           <div>
             {data.slip ? (
               <>
