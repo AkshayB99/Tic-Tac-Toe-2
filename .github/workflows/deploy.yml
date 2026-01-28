@@ -1,51 +1,43 @@
-name: Deploy to EC2 via SSH
+name: Deploy Tic-Tac-Toe to EC2
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy via SSH (git pull + docker build + run)
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
+          username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          debug: true   # helps with troubleshooting
           script: |
-            # Navigate to project (create if missing)
-            if [ ! -d "~/projects/tic-tac-toe" ]; then
-              mkdir -p ~/projects
-              cd ~/projects
-              git clone https://github.com/AkshayB99/Tic-Tac-Toe-2.git tic-tac-toe
-              cd tic-tac-toe
-            else
-              cd ~/projects/tic-tac-toe
+            echo "🚀 Starting deployment"
+
+            cd ~
+            if [ ! -d "Tic-Tac-Toe-2" ]; then
+              git clone https://github.com/AkshayB99/Tic-Tac-Toe-2.git
             fi
 
-            # Pull latest code (clean reset to avoid conflicts)
-            git fetch --all
-            git reset --hard origin/main
+            cd Tic-Tac-Toe-2
             git pull origin main
 
-            # Build Docker image
-            docker build -t tic-tac-toe:latest .
+            docker stop ${{ secrets.APP_NAME }} || true
+            docker rm ${{ secrets.APP_NAME }} || true
 
-            # Clean up old images
-            docker image prune -f
+            docker build -t ${{ secrets.APP_NAME }} .
 
-            # Restart container
-            docker stop tic-tac-toe || true
-            docker rm tic-tac-toe || true
             docker run -d \
-              --name tic-tac-toe \
-              --restart unless-stopped \
+              --name ${{ secrets.APP_NAME }} \
               -p 80:5173 \
-              tic-tac-toe:latest
+              ${{ secrets.APP_NAME }}
 
-            # Optional: show status
-            docker ps | grep tic-tac-toe
+            echo "✅ Deployment completed"
