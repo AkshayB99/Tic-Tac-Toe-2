@@ -1,0 +1,62 @@
+name: Build Docker → Transfer → Deploy on EC2
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: |
+          docker buildx build --tag tic-tac-toe:latest --load .
+
+      - name: Save image to tar
+        run: |
+          docker save tic-tac-toe:latest -o tic-tac-toe.tar
+
+      - name: Transfer image to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          source: "tic-tac-toe.tar"
+          target: "/home/${{ secrets.EC2_USERNAME }}/docker-images"
+          strip_components: 0
+
+      - name: Deploy on EC2 (load & run container)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Load the new image
+            docker load -i /home/${{ secrets.EC2_USERNAME }}/docker-images/tic-tac-toe.tar
+            
+            # Stop and remove old container (ignores errors if not exists)
+            docker stop tic-tac-toe || true
+            docker rm tic-tac-toe || true
+            
+            # Optional: remove old image layers to save space (safe)
+            docker image prune -f
+            
+            # Run the new container
+            docker run -d \
+              --name tic-tac-toe \
+              --restart unless-stopped \
+              -p 80:80 \
+              tic-tac-toe:latest
+            
+            # Optional: clean up the tar file
+            rm -f /home/${{ secrets.EC2_USERNAME }}/docker-images/tic-tac-toe.tar
