@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import Square from "./Square";
 import WinnerShow from "./WinnerShow";
 
+// data added
+
 const defaultSquares = () => new Array(9).fill(null);
 
 const lines = [
