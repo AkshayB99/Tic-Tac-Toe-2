@@ -19,5 +19,5 @@ spec:
       - name: tic-tac-toe-container
         image: 712062877401.dkr.ecr.us-east-1.amazonaws.com/tic-tac-toe:latest
         ports:
-        - containerPort: 3000
+        - containerPort: 5173
 ...
